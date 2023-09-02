@@ -201,6 +201,11 @@
         }
 
         .userChatInfo {
+          display: flex;
+          align-items: start;
+          justify-content: center;
+          flex-direction: column;
+          gap:2px;
           span {
             font-size: 18px;
             font-weight: 500;
@@ -208,6 +213,10 @@
           p {
             font-size: 14px;
             color: lightgray;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space:nowrap;
+            max-width: 100px;
           }
         }
       }

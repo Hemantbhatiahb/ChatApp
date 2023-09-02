@@ -1,18 +1,29 @@
-import React from "react";
+import React, { useContext } from "react";
+import AuthContext from "../store/AuthContext";
+import ChatContext from "../store/chat-context";
 
-const Message = () => {
+const Message = ({ message }) => {
+  const { currentUser } = useContext(AuthContext);
+  const chatCtx = useContext(ChatContext);
+
   return (
-    <div className="message owner">
+    <div
+      className={`message ${message?.senderId === currentUser?.uid && "owner"}`}
+    >
       <div className="messageInfo">
         <img
-          src="https://images.pexels.com/photos/17119475/pexels-photo-17119475/free-photo-of-man-selling-fresh-fruit-at-a-market.jpeg?auto=compress&cs=tinysrgb&w=400&lazy=load"
+          src={
+            message.senderId === currentUser?.uid
+              ? currentUser.photoURL
+              : chatCtx?.user.photoURL
+          }
           alt=""
         />
-        <span>just now</span>
+        <span>{message?.date.toDate().toLocaleTimeString()}</span>
       </div>
       <div className="messageContent">
-        <p>Hello there!</p>
-        <img src="https://images.pexels.com/photos/18093186/pexels-photo-18093186/free-photo-of-woman-in-shawl-standing-with-child-in-orchard.jpeg?auto=compress&cs=tinysrgb&w=400&lazy=load" alt="" />
+        { message?.text  && <p>{message?.text}</p>}
+        {message?.img && <img src={message.img} alt="" />}
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { auth, storage, db } from "../firebase";
 import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const RegisterPage = () => {
   const [userName, setUserName] = useState("");
@@ -38,6 +39,7 @@ const RegisterPage = () => {
     }
 
     try {
+      // create user
       const response = await createUserWithEmailAndPassword(
         auth,
         enteredEmail,
@@ -46,6 +48,7 @@ const RegisterPage = () => {
       const user = response.user;
       console.log(user);
 
+      // store image of user in firebase storage
       const storageUserNameFileRef = ref(storage, enteredName);
 
       const uploadTask = uploadBytesResumable(
@@ -75,6 +78,7 @@ const RegisterPage = () => {
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
             console.log("File available at", downloadURL);
+            // file upload completed -> update user profile 
             await updateProfile(user, {
               displayName: enteredName,
               photoURL: downloadURL,
@@ -128,7 +132,7 @@ const RegisterPage = () => {
           />
           <button type="submit">Sign up</button>
         </form>
-        <p>You have an account? Login</p>
+        <p>You have an account? <Link to="/login">Login</Link></p>
         {error && <span>{error.message}</span>}
       </div>
     </div>

@@ -4,27 +4,18 @@ import { auth } from "../firebase";
 
 const AuthContext = createContext({
   currentUser: {},
-  // login:(user)=>{},
-  // logout:()=>{}
 });
 
 export const AuthContextProvider = ({ children }) => {
-  const [user, setUser] = useState({});
-
-  //   const loginHandler =(user)=>{
-  //     setUser(user)
-  //   }
-
-  //   const logoutHandler =()=>{
-  //     setUser({})
-  //   }
+  const [currentUser, setCurrentUser] = useState(null);
+  
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
       if (user) {
-        //user signed in
-        setUser(user);
+        setCurrentUser(user);
+        localStorage.setItem("user", user.displayName);
       } else {
-        //user signed out
+        localStorage.removeItem("user");
       }
     });
 
@@ -33,10 +24,11 @@ export const AuthContextProvider = ({ children }) => {
     };
   }, []);
 
+  const context = {
+    currentUser: currentUser,
+  };
   return (
-    <AuthContext.Provider value={{ currentUser: user }}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={context}>{children}</AuthContext.Provider>
   );
 };
 
