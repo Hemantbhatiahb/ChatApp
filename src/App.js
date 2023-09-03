@@ -1,11 +1,9 @@
 import "./style.scss";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Register from "./pages/Register";
+import RegisterPage from "./pages/RegisterPage";
 import RootPage from "./pages/RootPage";
 import HomePage from "./pages/Home";
-import LoginPage from "./pages/Login";
-import { useContext } from "react";
-import AuthContext from "./store/AuthContext";
+import LoginPage from "./pages/LoginPage";
 
 const router = createBrowserRouter([
   {
@@ -22,7 +20,7 @@ const router = createBrowserRouter([
       },
       {
         path: "register",
-        element: <Register />,
+        element: <RegisterPage />,
       },
     ],
   },

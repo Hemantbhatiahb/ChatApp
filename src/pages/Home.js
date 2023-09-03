@@ -1,15 +1,16 @@
-import React from "react";
+import React, { useContext } from "react";
 import Sidebar from "../components/Sidebar";
 import Chat from "../components/Chat";
-import LoginPage from "./Login";
+import AuthContext from "../store/AuthContext";
+import { Navigate } from "react-router-dom";
 
 const HomePage = () => {
-  // const authCtx = useContext(AuthContext);
+  const { currentUser } = useContext(AuthContext);
 
   return (
     <React.Fragment>
-      {!localStorage.getItem('user') ? (
-        <LoginPage />
+      {!currentUser ? (
+        <Navigate to="/login" />
       ) : (
         <div className="home">
           <div className="container">

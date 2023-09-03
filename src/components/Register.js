@@ -8,7 +8,7 @@ import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
-const RegisterPage = () => {
+const Register = () => {
   const [userName, setUserName] = useState("");
   const [emailInput, setEmailInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
@@ -17,7 +17,11 @@ const RegisterPage = () => {
   const navigate = useNavigate();
 
   const handleFileChange = (event) => {
-    if (event.target.files && event.target.files[0]) {
+    if (
+      event.target.files &&
+      event.target.files[0] &&
+      event.target.files[0].type.startsWith("image/")
+    ) {
       setSelectedFile(event.target.files[0]);
     }
   };
@@ -32,9 +36,12 @@ const RegisterPage = () => {
       emailInput.trim().length === 0 ||
       !emailInput.includes("@") ||
       passwordInput.trim().length === 0 ||
-      passwordInput.length < 4
+      passwordInput.length < 4 ||
+      !selectedFile?.type.startsWith("image/")
     ) {
-      alert("email not valid  or password length to low");
+      alert(
+        "entered Inputs not valid or  password length to low or image not selected"
+      );
       return;
     }
 
@@ -78,7 +85,7 @@ const RegisterPage = () => {
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
             console.log("File available at", downloadURL);
-            // file upload completed -> update user profile 
+            // file upload completed -> update user profile
             await updateProfile(user, {
               displayName: enteredName,
               photoURL: downloadURL,
@@ -109,34 +116,46 @@ const RegisterPage = () => {
             type="text"
             placeholder="display name"
             onChange={(e) => setUserName(e.target.value)}
+            required
           />
           <input
             type="email"
             placeholder="email"
             onChange={(e) => setEmailInput(e.target.value)}
+            required
           />
           <input
             type="password"
             placeholder="password"
             onChange={(e) => setPasswordInput(e.target.value)}
+            required
           />
-          <label htmlFor="file">
-            <img src={Add} alt="add" />
-            <span>Add an avatar</span>
-          </label>
-          <input
-            style={{ display: "none" }}
-            type="file"
-            id="file"
-            onChange={handleFileChange}
-          />
+          <div className="imageContainer">
+            <label htmlFor="file">
+              <img src={Add} alt="add" />
+              <span>Add an avatar</span>
+            </label>
+            <input
+              style={{ display: "none" }}
+              type="file"
+              accept="image/*"
+              id="file"
+              onChange={handleFileChange}
+              required
+            />
+            {selectedFile && (
+              <img src={URL.createObjectURL(selectedFile)} alt="" />
+            )}
+          </div>
           <button type="submit">Sign up</button>
         </form>
-        <p>You have an account? <Link to="/login">Login</Link></p>
+        <p>
+          You have an account? <Link to="/login">Login</Link>
+        </p>
         {error && <span>{error.message}</span>}
       </div>
     </div>
   );
 };
 
-export default RegisterPage;
+export default Register;

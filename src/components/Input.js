@@ -1,6 +1,5 @@
 import React, { useContext, useState } from "react";
 import Img from "../img/img.png";
-import Attach from "../img/attach.png";
 import AuthContext from "../store/AuthContext";
 import ChatContext from "../store/chat-context";
 import {
@@ -26,6 +25,8 @@ const Input = () => {
   };
 
   const sendMessageHandler = async () => {
+    const enteredText = text;
+    setText("");
     if (currentUser && chatCtx.chatId) {
       try {
         // send image
@@ -33,7 +34,6 @@ const Input = () => {
           const storageRef = ref(storage, uniqueId());
 
           const uploadTask = uploadBytesResumable(storageRef, image);
-
           uploadTask.on(
             "state_changed",
             (snapshot) => {},
@@ -48,7 +48,7 @@ const Input = () => {
                     messages: arrayUnion({
                       id: uniqueId(),
                       img: downloadURL,
-                      text,
+                      text: enteredText,
                       senderId: currentUser.uid,
                       date: Timestamp.now(),
                     }),
@@ -60,13 +60,13 @@ const Input = () => {
           );
         } else {
           //send input message only
-          if (text.trim().length === 0 || text === "") {
+          if (enteredText.trim().length === 0 || enteredText === "") {
             return;
           }
           await updateDoc(doc(db, "chats", chatCtx.chatId), {
             messages: arrayUnion({
               id: uniqueId(),
-              text: text,
+              text: enteredText,
               senderId: currentUser.uid,
               date: Timestamp.now(),
             }),
@@ -75,20 +75,18 @@ const Input = () => {
 
         // add last message at sender and reciever end
         await updateDoc(doc(db, "userChats", currentUser.uid), {
-          [chatCtx.chatId + ".lastMessage"]: { text },
+          [chatCtx.chatId + ".lastMessage"]: { text: enteredText },
           [chatCtx.chatId + ".date"]: serverTimestamp(),
         });
 
         await updateDoc(doc(db, "userChats", chatCtx.user.uid), {
-          [chatCtx.chatId + ".lastMessage"]: { text },
+          [chatCtx.chatId + ".lastMessage"]: { text: enteredText },
           [chatCtx.chatId + ".date"]: serverTimestamp(),
         });
       } catch (error) {
         console.log(error.message);
       }
     }
-
-    setText("");
     setImage(null);
   };
   return (
@@ -100,11 +98,11 @@ const Input = () => {
         onChange={(e) => setText(e.target.value)}
       />
       <div className="send">
-        <img src={Attach} alt="" />
         <input
           type="file"
           style={{ display: "none" }}
           id="file"
+          accept="image/*"
           onChange={addInputImage}
         />
         <label htmlFor="file">

@@ -13,6 +13,7 @@ import {
 import { useContext } from "react";
 import AuthContext from "../store/AuthContext";
 import { db } from "../firebase";
+import ChatContext from "../store/chat-context";
 
 const Search = () => {
   const [searchUser, setSearchUser] = useState("");
@@ -20,6 +21,7 @@ const Search = () => {
   const [error, setError] = useState(null);
   const [firstRun, setFirstRun] = useState(true);
   const { currentUser } = useContext(AuthContext);
+  const chatCtx = useContext(ChatContext);
 
   useEffect(() => {
     const timer = setTimeout(async () => {
@@ -87,14 +89,17 @@ const Search = () => {
           [combinedId + ".date"]: serverTimestamp(),
         });
 
-        console.log('update done!')
+        console.log("update done!");
+
+        // select user's chat
+        chatCtx.changeUser(user);
       }
     } catch (error) {
       setError(error.message);
     }
 
-    setUsers([])
-    setSearchUser('')
+    setUsers([]);
+    setSearchUser("");
   };
   return (
     <div className="search">
