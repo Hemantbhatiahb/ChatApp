@@ -7,12 +7,49 @@ import { auth, storage, db } from "../firebase";
 import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import useInput from "../hooks/use-input";
+import { RotatingLines } from "react-loader-spinner";
+const isNotEmpty = (value) => value.trim() !== "";
+const isEmail = (value) => value.includes("@");
+const isPasswordLength5 = (value) => value.trim().length > 5;
 
 const Register = () => {
-  const [userName, setUserName] = useState("");
-  const [emailInput, setEmailInput] = useState("");
-  const [passwordInput, setPasswordInput] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
+  const [loading, setIsLoading] = useState(false);
+
+  const {
+    value: nameInput,
+    isValid: nameIsValid,
+    hasError: nameHasError,
+    valueChangeHandler: nameChangeHandler,
+    inputBlurHandler: nameBlurHandler,
+    reset: resetName,
+  } = useInput(isNotEmpty);
+
+  const {
+    value: emailInput,
+    isValid: emailIsValid,
+    hasError: emailHasError,
+    valueChangeHandler: emailChangeHandler,
+    inputBlurHandler: emailBlurHandler,
+    reset: resetEmail,
+  } = useInput(isEmail);
+
+  const {
+    value: passwordInput,
+    isValid: passwordIsValid,
+    hasError: passwordHasError,
+    valueChangeHandler: passwordChangeHandler,
+    inputBlurHandler: passwordBlurHandler,
+    reset: resetPassword,
+  } = useInput(isPasswordLength5);
+
+  let formIsValid = false;
+
+  if (nameIsValid && emailIsValid && passwordIsValid) {
+    formIsValid = true;
+  }
+
   const [error, setError] = useState(false);
   const navigate = useNavigate();
 
@@ -29,21 +66,14 @@ const Register = () => {
   const formSubmitHandler = async (event) => {
     event.preventDefault();
     // console.log(selectedFile);
-    const enteredName = userName;
-    const enteredEmail = emailInput;
-    const enteredPassword = passwordInput;
-    if (
-      emailInput.trim().length === 0 ||
-      !emailInput.includes("@") ||
-      passwordInput.trim().length === 0 ||
-      passwordInput.length < 4 ||
-      !selectedFile?.type.startsWith("image/")
-    ) {
-      alert(
-        "entered Inputs not valid or  password length to low or image not selected"
-      );
+    if (!formIsValid || !selectedFile?.type.startsWith("image/")) {
+      alert("please enter all the details! (HINT : select avatar)");
       return;
     }
+    setIsLoading(true);
+    const enteredName = nameInput;
+    const enteredEmail = emailInput;
+    const enteredPassword = passwordInput;
 
     try {
       // create user
@@ -81,6 +111,8 @@ const Register = () => {
         },
         (error) => {
           setError(error);
+          setIsLoading(false);
+          return;
         },
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
@@ -103,7 +135,13 @@ const Register = () => {
       );
     } catch (error) {
       setError(error);
+      setIsLoading(false);
+      return;
     }
+    setIsLoading(false);
+    resetPassword();
+    resetEmail();
+    resetName();
   };
 
   return (
@@ -115,21 +153,34 @@ const Register = () => {
           <input
             type="text"
             placeholder="display name"
-            onChange={(e) => setUserName(e.target.value)}
+            onChange={nameChangeHandler}
+            onBlur={nameBlurHandler}
+            value={nameInput}
             required
           />
+          {nameHasError && (
+            <p className="error-text">Name should not be empty</p>
+          )}
           <input
             type="email"
             placeholder="email"
-            onChange={(e) => setEmailInput(e.target.value)}
+            value={emailInput}
+            onChange={emailChangeHandler}
+            onBlur={emailBlurHandler}
             required
           />
+          {emailHasError && <p className="error-text">Email is not valid</p>}
           <input
             type="password"
             placeholder="password"
-            onChange={(e) => setPasswordInput(e.target.value)}
+            value={passwordInput}
+            onChange={passwordChangeHandler}
+            onBlur={passwordBlurHandler}
             required
           />
+          {passwordHasError && (
+            <p className="error-text">Password is too short</p>
+          )}
           <div className="imageContainer">
             <label htmlFor="file">
               <img src={Add} alt="add" />
@@ -153,6 +204,15 @@ const Register = () => {
           You have an account? <Link to="/login">Login</Link>
         </p>
         {error && <span>{error.message}</span>}
+        {
+          <RotatingLines
+            strokeColor="#7b96ec"
+            visible={loading}
+            strokeWidth="4"
+            color="blue"
+            width={50}
+          />
+        }
       </div>
     </div>
   );

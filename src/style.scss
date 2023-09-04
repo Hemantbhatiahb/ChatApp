@@ -59,6 +59,10 @@
         }
       }
 
+      .error-text {
+        color: #b40e0e;
+      }
+
       label {
         display: flex;
         align-items: center;
@@ -77,7 +81,7 @@
 
       .imageContainer {
         display: flex;
-        gap:30px;
+        gap: 30px;
 
         img {
           width: 40px;
@@ -96,6 +100,13 @@
 
         &:hover {
           background-color: #5970bc;
+        }
+
+        &:disabled,
+        &:disabled:hover {
+          background-color: #ccc;
+          color: #292929;
+          cursor: not-allowed;
         }
       }
     }
@@ -168,8 +179,9 @@
             padding: 4px 6px;
 
             &:hover {
-              background-color:#3e3c61;
+              background-color: #3e3c61;
             }
+
             @include tablet {
               position: absolute;
               bottom: 10px;
@@ -289,7 +301,6 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-           
 
             p {
               background-color: white;
