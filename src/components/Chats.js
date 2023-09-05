@@ -34,7 +34,7 @@ const Chats = () => {
   return (
     <div className="chats">
       {/* converting chats to array and mapping through user's chats */}
-      {Object.entries(chats)
+      {chats && Object.keys(chats).length !== 0 && Object.entries(chats)
         ?.sort((a, b) => b[1].date - a[1].date)
         .map((chat) => (
           <div

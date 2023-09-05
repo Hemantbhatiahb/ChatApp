@@ -39,7 +39,8 @@ const Search = () => {
         searchUser.trim() === ""
           ? setUsers([])
           : setUsers(
-              usersData.filter((user) =>
+              usersData.filter((user) => 
+                user.uid !== currentUser.uid &&
                 user.displayName
                   .toLowerCase()
                   .includes(searchUser.toLowerCase())
@@ -51,7 +52,7 @@ const Search = () => {
     return () => {
       clearTimeout(timer);
     };
-  }, [firstRun, searchUser]);
+  }, [currentUser.uid, firstRun, searchUser]);
 
   const addUserHandler = async (user) => {
     // if user exists take that user , else create new user

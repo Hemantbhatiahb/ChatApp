@@ -98,6 +98,7 @@ const Input = () => {
         onChange={(e) => setText(e.target.value)}
       />
       <div className="send">
+        {image && <img src={URL.createObjectURL(image)} alt="" />}
         <input
           type="file"
           style={{ display: "none" }}
